@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>متجر بطاقات NFC</title>
+<style>
+  body {
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin:0; padding:0;
+    direction: rtl;
+    background: url("https://i.postimg.cc/7LbC2Qth/nfc-card-and-digital-card-1110-1024x904.png") no-repeat center center fixed; /* رابط خلفية الصفحة */
+    background-size: cover;
+    color:#333;
+  }
+  body::before {
+    content:""; position:fixed; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.4); z-index:-1;
+  }
+
+  /* سلايدر ديناميكي */
+  header {position:relative; width:100%; height:350px; overflow:hidden;}
+  .slider {position:relative; width:100%; height:100%;}
+  .slides img {
+    width:100%; height:100%; object-fit:cover;
+    position:absolute; top:0; left:0;
+    display:none;
+  }
+  .overlay {
+    position:absolute; top:0; left:0; width:100%; height:100%;
+    background: rgba(0,0,0,0.35);
+    color:#fff; display:flex; flex-direction:column;
+    align-items:center; justify-content:center; text-align:center;
+    z-index:2;
+  }
+  .overlay h1 {font-size:32px; margin:0; text-shadow:1px 1px 4px rgba(0,0,0,0.7);}
+  .overlay p {font-size:18px; margin-top:10px; text-shadow:1px 1px 4px rgba(0,0,0,0.7);}
+
+  /* خط فاصل */
+  .divider {height:4px; background:#fff; opacity:0.5; margin-bottom:40px;}
+
+  /* صندوق الطلب */
+  .form-background {padding:0 0 40px 0;}
+  .container {
+    max-width:600px; margin:0 auto; padding:25px 20px;
+    background: url("") no-repeat center center; /* خلفية صندوق الطلب */
+    background-size: cover; border-radius:16px; box-shadow:0 8px 25px rgba(0,0,0,0.4);
+    position:relative; overflow:hidden;
+  }
+  .container::before {
+    content:""; position:absolute; top:0; left:0; width:100%; height:100%;
+    background: rgba(255,255,255,0.85); z-index:1;
+  }
+  .container * {position:relative; z-index:2;}
+  h2 {text-align:center; margin-bottom:15px; color:#1565d8;}
+  label {display:block; margin-top:8px; font-size:14px; font-weight:bold; color:#444;}
+  input, select {width:100%; padding:8px 10px; margin-top:3px; border:1px solid #ccc; border-radius:6px; font-size:14px;}
+  button {margin-top:12px; padding:12px; border:none; border-radius:8px; cursor:pointer; width:100%; font-size:15px; transition:0.3s;}
+  .btn-primary {background:#1565d8; color:#fff;}
+  .btn-primary:hover {background:#0f4ba5;}
+  .btn-whatsapp {background:#10b981; color:#fff;}
+  .btn-whatsapp:hover {background:#0a8f65;}
+  #totalPrice {margin-top:12px; font-weight:bold; font-size:16px; color:#222; text-align:center;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="slider">
+    <div class="slides">
+      <img src="https://i.postimg.cc/T1fr8JQ6/Design-sans-titre-jpg.jpg" alt="صورة 1">
+      <img src="https://i.postimg.cc/4x0fr4w4/download.jpg" alt="صورة 2">
+      <img src="https://i.postimg.cc/Gh21dw44/images-1.jpg" alt="صورة 3">
+    </div>
+    <div class="overlay">
+      <h1>متجر بطاقات NFC</h1>
+      <p>بطاقات ذكية لتواصل احترافي بلمسة واحدة</p>
+    </div>
+  </div>
+</header>
+
+<div class="divider"></div> <!-- الخط الفاصل -->
+
+<div class="form-background">
+  <div class="container">
+    <h2>معلومات الطلب</h2>
+    <form id="orderForm">
+      <label>الاسم الكامل</label>
+      <input id="fullName" required />
+      <label>رقم الهاتف</label>
+      <input id="phone" required />
+      <label>الولاية</label>
+      <select id="wilaya" required><option value="">— اختر ولايتك —</option></select>
+      <label>البلدية</label>
+      <select id="commune" required><option value="">— اختر البلدية —</option></select>
+      <label>العنوان</label>
+      <input id="address" />
+      <label>العرض</label>
+      <select id="offer" required>
+        <option value="single" data-price="1900">بطاقة عادية — 1900 دج</option>
+        <option value="double" data-price="3500">بطاقتان — 3500 دج</option>
+        <option value="custom" data-price="2900">معدلة — 2900 دج</option>
+      </select>
+      <label>الشحن</label>
+      <select id="shipping" required>
+        <option value="standard" data-fee="400">عادي — 400 دج</option>
+        <option value="express" data-fee="600">سريع — 600 دج</option>
+      </select>
+      <div id="totalPrice">السعر الكلي: —</div>
+      <button type="button" class="btn-primary" id="sendOrder">تأكيد الطلب عبر Yalidine</button>
+      <button type="button" class="btn-whatsapp" id="sendWhatsApp">إرسال عبر واتساب</button>
+    </form>
+  </div>
+</div>
+
+<script>
+// سلايدر ديناميكي
+const slides = document.querySelectorAll('.slides img');
+let current = 0;
+function showSlide() {
+  slides.forEach((img, i) => { img.style.display = (i===current) ? 'block' : 'none'; });
+  current = (current + 1) % slides.length;
+}
+showSlide();
+setInterval(showSlide, 4000);
+
+// حساب السعر الكلي
+const offerSel=document.getElementById('offer');
+const shipSel=document.getElementById('shipping');
+const totalDiv=document.getElementById('totalPrice');
+function calcTotal(){
+  const base=Number(offerSel.options[offerSel.selectedIndex].dataset.price||0);
+  const ship=Number(shipSel.options[shipSel.selectedIndex].dataset.fee||0);
+  const total=base+ship;
+  totalDiv.textContent='السعر الكلي: '+total.toLocaleString('ar-DZ')+' دج';
+  return {total};
+}
+offerSel.addEventListener('change',calcTotal);
+shipSel.addEventListener('change',calcTotal);
+calcTotal();
+
+// ولايات وبلديات
+let WILAYAS={};
+const wilayaSel=document.getElementById('wilaya');
+const communeSel=document.getElementById('commune');
+fetch('algeria_postcodes.json').then(r=>r.json()).then(data=>{
+  const grouped={};
+  data.forEach(e=>{
+    if(!grouped[e.wilaya_code]) grouped[e.wilaya_code]={code:e.wilaya_code,name:e.wilaya_name,communes:[]};
+    if(!grouped[e.wilaya_code].communes.includes(e.commune_name)) grouped[e.wilaya_code].communes.push(e.commune_name);
+  });
+  const list=Object.values(grouped).sort((a,b)=>a.code.localeCompare(b.code));
+  WILAYAS=list.reduce((acc,w)=>{acc[w.code]=w;return acc;},{}); 
+  list.forEach(w=>{const o=document.createElement('option');o.value=w.code;o.textContent=w.name;wilayaSel.appendChild(o);});
+});
+wilayaSel.addEventListener('change',()=>{
+  communeSel.innerHTML='<option value="">— اختر البلدية —</option>';
+  const w=WILAYAS[wilayaSel.value];if(!w)return;
+  w.communes.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;communeSel.appendChild(o);});
+});
+
+// حفظ الطلب وإرسال واتساب
+document.getElementById('sendWhatsApp').addEventListener('click', ()=>{
+  const {total}=calcTotal();
+  const data = {
+    fullName: document.getElementById('fullName').value,
+    phone: document.getElementById('phone').value,
+    wilaya: wilayaSel.options[wilayaSel.selectedIndex].text,
+    commune: communeSel.value,
+    address: document.getElementById('address').value,
+    offer: offerSel.options[offerSel.selectedIndex].text,
+    shipping: shipSel.options[shipSel.selectedIndex].text,
+    totalPrice: total
+  };
+
+  // حفظ تلقائي في CSV
+  fetch('save_order.php', {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(data)
+  });
+
+  // إرسال عبر واتساب
+  const msg=`طلب بطاقة NFC:
+الاسم: ${data.fullName}
+الهاتف: ${data.phone}
+الولاية: ${data.wilaya}
+البلدية: ${data.commune}
+العنوان: ${data.address}
+العرض: ${data.offer}
+الشحن: ${data.shipping}
+السعر الكلي: ${data.totalPrice} دج`;
+  window.open('https://wa.me/213770984554?text='+encodeURIComponent(msg),'_blank');
+});
+</script>
+
+</body>
+</html>
